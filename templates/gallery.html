@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('gallery') }}">PhotoGallery</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('upload') }}">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('gallery') }}">Gallery</a>
+                    </li>
+                </ul>
+    
+                <ul class="navbar-nav ms-auto">
+                    {% if 'user_id' in session %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-danger text-white" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary text-white" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+<head>
+    <title>My Gallery - Photo Gallery</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 50px; }
+        .gallery-container { max-width: 1200px; margin: 0 auto; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .gallery-item { 
+            position: relative; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            transition: transform 0.3s ease; 
+        }
+        .gallery-item:hover { transform: scale(1.05); }
+        .gallery-item img { 
+            width: 100%; 
+            height: 250px; 
+            object-fit: cover; 
+        }
+        .gallery-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container gallery-container">
+        <h2 class="text-center mb-4">My Photo Gallery</h2>
+    
+        <!-- Search Bar -->
+        <form method="GET" action="{{ url_for('gallery') }}" class="mb-4 text-center">
+            <input type="text" name="search" class="form-control d-inline-block w-50" 
+                   placeholder="Search by filename..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary mt-2">Search</button>
+        </form>
+    
+        {% if photos %}
+            <div class="gallery-grid">
+                {% for photo in photos %}
+                    <div class="gallery-item">
+                        <img src="{{ photo.photo_url }}" alt="{{ photo.original_filename }}">
+                        <div class="gallery-item-overlay">
+                            <small>{{ photo.original_filename }}</small>
+                            <a href="{{ url_for('download_photo', photo_id=photo.id) }}" class="btn btn-sm btn-success">
+                                Download
+                            </a>
+                            
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                {% if search_query %}
+                    No results found for "{{ search_query }}".
+                {% else %}
+                    No photos uploaded yet. <a href="{{ url_for('upload') }}">Upload your first photo!</a>
+                {% endif %} 
+            </div>
+        {% endif %}
+    </div>    
+</body>
+</html>

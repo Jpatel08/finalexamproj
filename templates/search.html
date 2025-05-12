@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Photos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .photo {
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 300px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Photos</h1>
+    <form method="POST" action="{{ url_for('search') }}" class="search-box">
+        <input type="text" name="search_query" placeholder="Search by description">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if photos %}
+        <div class="photo-container">
+            {% for photo in photos %}
+                <div class="photo">
+                    <img src="{{photo.s3_url }}" alt="{{ photo.photo_name }}">
+                    <p>{{ photo.description }}</p>
+                    <a href="{{ photo.s3_url }}" download>Download</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No photos found.</p>
+    {% endif %}
+</body>
+</html>
