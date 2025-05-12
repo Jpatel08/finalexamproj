@@ -1,0 +1,14 @@
+runtime: python310
+entrypoint: gunicorn -b :$PORT app:app
+env_variables:
+  SECRET_KEY: 'super secret key'
+  GCS_BUCKET_NAME: "photogallerygcpbucket"
+  DB_USER: "root"
+  DB_PASS: "L1Z_O|5B?,cE#ML+"
+  DB_CONNECTION_NAME: "photo-gallery-app-454918:us-central1:photo-gallery-db"
+
+instance_class: F1
+automatic_scaling:
+  max_instances: 1
+  min_instances: 0
+  max_idle_instances: 1
