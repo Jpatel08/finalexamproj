@@ -5,15 +5,14 @@ import logging
 import requests
 import pymysql
 import mysql.connector
-import sqlalchemy
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from google.cloud import storage
-from google.cloud.sql.connector import Connector
+
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from google.auth import compute_engine, default
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +26,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
 # Constants
-BUCKET_NAME = os.getenv('GCS_BUCKET_NAME', 'photogallerygcpbucket')
+BUCKET_NAME = os.getenv('GCS_BUCKET_NAME', 'finalprojgcpbucket')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
 
@@ -40,18 +39,14 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_db_connection():
-    """Creates a connection to the Cloud SQL database."""
-    connector = Connector()
-    
-    conn = connector.connect(
-        os.getenv("DB_CONNECTION_NAME"),       
-        "pymysql",
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        database='photogallery'
+    connection = mysql.connector.connect(
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASS"),
+        unix_socket=os.environ.get("DB_SOCKET_PATH"),
+        database="gallery"
     )
-    
-    return conn
+    return connection
+
 
 def generate_signed_url(blob_name, expiration=3600):
     """Generates a URL for a given blob in Google Cloud Storage."""
