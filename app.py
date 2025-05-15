@@ -96,8 +96,8 @@ def register():
         db = None
         try:
             db = get_db_connection()
-            cursor = db.cursor()
-            
+            cursor = db.cursor(dictionary=True)
+
             # Insert new user
             cursor.execute(
                 'INSERT INTO users (username, password_hash) VALUES (%s, %s)', 
@@ -128,7 +128,7 @@ def login():
         password = request.form['password']
         
         db = get_db_connection()
-        cursor = db.cursor(cursor=pymysql.cursors.DictCursor)        
+        cursor = db.cursor(dictionary=True)
         # Check user credentials
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
         user = cursor.fetchone()
@@ -198,7 +198,8 @@ def upload():
 
                     # Store metadata in database
                     db = get_db_connection()
-                    cursor = db.cursor(cursor=pymysql.cursors.DictCursor)  
+                    cursor = db.cursor(dictionary=True)
+  
 
                     cursor.execute(
                         'INSERT INTO photos (user_id, photo_url, original_filename) VALUES (%s, %s, %s)',
@@ -229,7 +230,8 @@ def gallery():
         return redirect(url_for('login'))
         
     db = get_db_connection()
-    cursor = db.cursor(cursor=pymysql.cursors.DictCursor)  
+    cursor = db.cursor(dictionary=True)
+ 
     
     search_query = request.args.get('search', '')  # Get search term from query parameters
     user_id = session.get('user_id')
@@ -259,7 +261,8 @@ def download_photo(photo_id):
         return redirect(url_for('login'))
 
     db = get_db_connection()
-    cursor = db.cursor(cursor=pymysql.cursors.DictCursor)
+    cursor = db.cursor(dictionary=True)
+
 
     cursor.execute("SELECT photo_url, original_filename FROM photos WHERE id = %s AND user_id = %s", 
                    (photo_id, session['user_id']))
