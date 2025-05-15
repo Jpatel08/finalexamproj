@@ -39,13 +39,19 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_db_connection():
-    connection = mysql.connector.connect(
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASS"),
-        unix_socket=os.environ.get("DB_SOCKET_PATH"),
-        database="gallery"
-    )
-    return connection
+    try:
+        conn = mysql.connector.connect(
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASS"),
+            unix_socket=os.environ.get("DB_SOCKET_PATH"),
+            database="gallery"
+        )
+        logger.info("✅ Successfully connected to MySQL")
+        return conn
+    except Exception as e:
+        logger.error(f"❌ DB connection failed: {e}")
+        raise
+
 
 
 def generate_signed_url(blob_name, expiration=3600):
